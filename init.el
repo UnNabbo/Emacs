@@ -4,6 +4,10 @@
 (setq custom-file (expand-file-name "../custom.el" user-emacs-directory))
 (load-file custom-file)
 
+;;; REMOVE TO DEBUG INIT FILE
+(setq-default message-log-max nil)
+(kill-buffer "*Messages*")
+
 (load-file  (expand-file-name "../src/basic.el" user-emacs-directory))
 (global-set-key (kbd "C-c p") 'find-file-at-point)
 (global-set-key (kbd "C-c i m") 'imenu)
