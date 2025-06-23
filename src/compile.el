@@ -1,4 +1,8 @@
-(setq compile-command "build")
+(require 'compile)
+(require 'ansi-color)
+
+(setq compilation-ask-about-save nil)
+
 (defvar root-directory (or default-directory ".") "The directory to run compile commands from.")
 
 (defun set-root (directory)

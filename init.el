@@ -1,18 +1,19 @@
 ;;; Initialization
 (package-initialize)
-
 (setq custom-file (expand-file-name "../custom.el" user-emacs-directory))
 (load-file custom-file)
 
 ;;; REMOVE TO DEBUG INIT FILE
 (setq-default message-log-max nil)
-(kill-buffer "*Messages*")
+;(kill-buffer "*Messages*")
+(setq make-backup-files nil)
 
 (load-file  (expand-file-name "../src/basic.el" user-emacs-directory))
 (global-set-key (kbd "C-c p") 'find-file-at-point)
-(global-set-key (kbd "C-c i m") 'imenu)
 (global-set-key (kbd "C-c M-q") 'rc/unfill-paragraph)
 (global-set-key (kbd "C-,") 'rc/duplicate-line)
+(global-set-key (kbd "C-x p s") 'rc/rgrep-selected)
+(global-set-key (kbd "C-x p d") 'rc/insert-timestamp)
 
 (load-relative "src/misc.el")
 (global-set-key (kbd "<tab>") 'indent-or-dabbrev-expand)
@@ -20,6 +21,7 @@
 (load-relative "src/ui.el")
 (global-set-key (kbd "C-c t") 'switch-theme)
 
+(setq compile-command "build")
 (load-relative "src/compile.el")
 (global-set-key (kbd "M-m") 'compile-in-root-without-asking)
 (global-set-key (kbd "M-<f1>") 'compile-in-root-without-asking)
@@ -42,12 +44,7 @@
 
 (load-relative "src/modules/treesit.el")
 
-(load-relative "src/modes/jai-ts-mode.el")
-(load-relative "src/jai_tweaks.el")
-(define-key jai-ts-mode-map (kbd "C-M-a") 'jai-ts-mode--prev-defun)
-(define-key jai-ts-mode-map (kbd "C-M-e") 'jai-ts-mode--next-defun)
-(define-key jai-ts-mode-map (kbd "C-M-l") 'align-regexp)
-(define-key jai-ts-mode-map (kbd "C-M-S-l") 'jai-ts-mode--align-struct)
+(load-relative "src/modules/consult.el")
 
 (rc/require 'multiple-cursors)
 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
@@ -66,8 +63,21 @@
 
 (rc/require 'vundo)
 
+(load-relative "src/modes/jai-ts-mode.el")
+(load-relative "src/jai_tweaks.el")
+(define-key jai-ts-mode-map (kbd "C-M-a")   'jai-ts-mode--prev-defun)
+(define-key jai-ts-mode-map (kbd "C-M-e")   'jai-ts-mode--next-defun)
+(define-key jai-ts-mode-map (kbd "C-M-S-l") 'jai-ts-mode--align-struct)
+(define-key jai-ts-mode-map (kbd "C-M-l")   'align-regexp)
+
+(load-relative "src/c-extension.el")
+(with-eval-after-load 'cc-mode
+  (dolist (map (list c-mode-map c++-mode-map))
+    (define-key map (kbd "C-c C-f") 'find-corresponding-file)
+    (define-key map (kbd "M-i") 'if0)))
+
+
 (global-unset-key [mouse-2])
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 (global-set-key (kbd "C-z") 'undo)
 (global-set-key (kbd "M-n") (lambda () (interactive) (duplicate-line) (next-line)))
-

@@ -324,10 +324,10 @@ Return nil if there is no name or if NODE is not a defun node."
 ;; to reset to nothing:
 ;;(unload-feature 'jai-ts-mode t)
 
-;; (defconst jai-ts-mode-error-regexp
-;;   "^\\([^ \n:]+.*\.jai\\):\\([0-9]+\\),\\([0-9]+\\):")
-;; (push `(jai ,jai-ts-mode-error-regexp 1 2 3 2) compilation-error-regexp-alist)
-;; (push 'jai compilation-error-regexp-alist)
+(defconst jai-ts-mode-error-regexp
+  "^\\([^ \n:]+.*\.jai\\):\\([0-9]+\\),\\([0-9]+\\):")
+(push `(jai ,jai-ts-mode-error-regexp 1 2 3 2) compilation-error-regexp-alist-alist)
+(push 'jai compilation-error-regexp-alist)
 
 (defun jai-ts-mode--matching-brace ()
   "Jump to matching { or (."
@@ -403,11 +403,6 @@ ARG will be passed through (for going forwards)."
 ;;       "C-M-S-l" #'jai-ts-mode--align-struct)
 
 (add-to-list 'auto-mode-alist '("\\.jai\\'" . jai-ts-mode))
-
-(setq compilation-error-regexp-alist nil)
-(defconst jai--error-regexp "\\([^ \n:]+.*\.jai\\):\\([0-9]+\\),\\([0-9]+\\):")
-(push `(jai ,jai--error-regexp 1 2 3 2) compilation-error-regexp-alist)
-(push 'jai compilation-error-regexp-alist)
 
 (provide 'jai-ts-mode)
 

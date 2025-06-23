@@ -33,14 +33,21 @@
 (rc/require 'dash-functional)
 (require 'dash-functional)
 
-;;; MISC 
 
 (require 'ansi-color)
 
+(setq-default inhibit-splash-screen t
+              make-backup-files nil
+              tab-width 4
+              indent-tabs-mode nil
+              compilation-scroll-output t
+              default-input-method "russian-computer"
+              visible-bell (equal system-type 'windows-nt))
+
 (defun rc/colorize-compilation-buffer ()
-  (toggle-read-only)
+  (read-only-mode 'toggle)
   (ansi-color-apply-on-region compilation-filter-start (point))
-  (toggle-read-only))
+  (read-only-mode 'toggle))
 (add-hook 'compilation-filter-hook 'rc/colorize-compilation-buffer)
 
 (defun rc/buffer-file-name ()
@@ -93,6 +100,23 @@
         (kill-buffer buffer)
         (message "Killed autoloads buffer %s" name)))))
 
+;;; Taken from here:
+;;; http://blog.bookworm.at/2007/03/pretty-print-xml-with-emacs.html
+(defun bf-pretty-print-xml-region (begin end)
+  "Pretty format XML markup in region. You need to have nxml-mode
+http://www.emacswiki.org/cgi-bin/wiki/NxmlMode installed to do
+this.  The function inserts linebreaks to separate tags that have
+nothing but whitespace between them.  It then indents the markup
+by using nxml's indentation rules."
+  (interactive "r")
+  (save-excursion
+    (nxml-mode)
+    (goto-char begin)
+    (while (search-forward-regexp "\>[ \\t]*\<" nil t) 
+      (backward-char) (insert "\n"))
+    (indent-region begin end))
+  (message "Ah, much better!"))
+
 ;;; Stolen from http://ergoemacs.org/emacs/emacs_unfill-paragraph.html
 (defun rc/unfill-paragraph ()
   "Replace newline chars in current paragraph by single spaces.
@@ -100,8 +124,6 @@ This command does the inverse of `fill-paragraph'."
   (interactive)
   (let ((fill-column 90002000)) ; 90002000 is just random. you can use `most-positive-fixnum'
     (fill-paragraph nil)))
-
-
 
 (defun rc/load-path-here ()
   (interactive)
@@ -131,12 +153,17 @@ This command does the inverse of `fill-paragraph'."
     (move-beginning-of-line 1)
     (forward-char column)))
 
+(defun rc/insert-timestamp ()
+  (interactive)
+  (insert (format-time-string "(%Y-%m-%d %H:%M:%S)")))
+
+(defun rc/rgrep-selected (beg end)
+  (interactive (if (use-region-p)
+                   (list (region-beginning) (region-end))
+                 (list (point-min) (point-min))))
+  (rgrep (buffer-substring-no-properties beg end) "*" (pwd)))
 
 ;;; A little hack which fixes a problem with meta key in fluxbox under VNC.
 (setq x-alt-keysym 'meta)
 
 (setq confirm-kill-emacs 'y-or-n-p)
-
-
-(rc/require 'load-relative)
-
