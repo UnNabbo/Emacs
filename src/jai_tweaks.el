@@ -15,9 +15,15 @@
     "%" "=" "+=" "-=" "*=" "/=" "%="
     "==" "!=" ">=" "<=" "&&" "||" "!" "&" "|" "^" "~" "<<" ">>" "<" ">"))
 
-(font-lock-add-keywords 'jai-ts-mode
-						`((,(regexp-opt jai-operators) 0 'font-lock-operator-face )))
+(defconst jai-keywords
+  '("context"))
 
+(font-lock-add-keywords 'jai-ts-mode
+						`((,(regexp-opt jai-operators) 0 'font-lock-operator-face)
+						  (,(regexp-opt jai-keywords) 0 'font-lock-keyword-face)
+						  ("\\<[A-Z][A-Z0-9_]+\\>" . 'jai-uppercase-face)
+						  ("\\([A-Za-z0-9_]+\\)\\.\\([A-Z]+\\)" 1 'font-lock-type-face)
+						  ))
 
 (defun treesit-enabled-p ()
   "Checks if the current buffer has a treesit parser."
@@ -61,3 +67,4 @@ in a predefined list."
         (call-interactively #'xref-find-references)
       (call-interactively #'xref-find-definitions))))
 
+;; Bind to M-. (overrides the default xref-find-definitions)

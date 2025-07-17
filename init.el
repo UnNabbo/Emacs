@@ -5,8 +5,10 @@
 
 ;;; REMOVE TO DEBUG INIT FILE
 (setq-default message-log-max nil)
+
 ;(kill-buffer "*Messages*")
 (setq make-backup-files nil)
+
 
 (load-file  (expand-file-name "../src/basic.el" user-emacs-directory))
 (global-set-key (kbd "C-c p") 'find-file-at-point)
@@ -17,11 +19,12 @@
 
 (load-relative "src/misc.el")
 (global-set-key (kbd "<tab>") 'indent-or-dabbrev-expand)
+(global-set-key (kbd "C-ò") 'jump-to-next-char)
 
 (load-relative "src/ui.el")
 (global-set-key (kbd "C-c t") 'switch-theme)
 
-(setq compile-command "build")
+(setq compile-command "jai first.jai -")
 (load-relative "src/compile.el")
 (global-set-key (kbd "M-m") 'compile-in-root-without-asking)
 (global-set-key (kbd "M-<f1>") 'compile-in-root-without-asking)
@@ -42,7 +45,19 @@
 
 (load-relative "src/modules/markdown.el")
 
+
 (load-relative "src/modules/treesit.el")
+
+;; (load-relative "src/modules/topsy.el")
+;; (rc/require 'rg)
+;; (rc/require 'ivy)
+;; (rc/require 'swiper)
+;; (keymap-global-set "C-s" #'swiper-isearch)
+
+;; (rc/require 'projectile)
+;; (projectile-mode +1)
+;; (setq projectile-completion-system 'ivy)
+;; (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
 (load-relative "src/modules/consult.el")
 
@@ -63,12 +78,14 @@
 
 (rc/require 'vundo)
 
+(load-relative "src/modes/jai-mode.el")
 (load-relative "src/modes/jai-ts-mode.el")
 (load-relative "src/jai_tweaks.el")
 (define-key jai-ts-mode-map (kbd "C-M-a")   'jai-ts-mode--prev-defun)
 (define-key jai-ts-mode-map (kbd "C-M-e")   'jai-ts-mode--next-defun)
 (define-key jai-ts-mode-map (kbd "C-M-S-l") 'jai-ts-mode--align-struct)
 (define-key jai-ts-mode-map (kbd "C-M-l")   'align-regexp)
+(define-key jai-ts-mode-map (kbd "M-i")   'jai/if0)
 
 (load-relative "src/c-extension.el")
 (with-eval-after-load 'cc-mode
@@ -81,3 +98,21 @@
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 (global-set-key (kbd "C-z") 'undo)
 (global-set-key (kbd "M-n") (lambda () (interactive) (duplicate-line) (next-line)))
+(global-set-key (kbd "M-RET") (lambda () (interactive) (push-mark) (ffap)))
+
+
+(load-relative "src/emacs_bug.el")
+
+;TODO make this stick to every ts-mode
+(defconst jai-operators
+  '("." ":" "+" "-" "*" "/" 
+    "%" "=" "+=" "-=" "*=" "/=" "%="
+    "==" "!=" ">=" "<=" "&&" "||" "!" "&" "|" "^" "~" "<<" ">>" "<" ">"))
+
+(font-lock-add-keywords 'python-ts-mode
+						`((,(regexp-opt jai-operators) 0 'font-lock-operator-face )))
+
+
+(require 'server)
+(unless (server-running-p)
+  (server-start)) 

@@ -122,6 +122,8 @@
 
 (defconst jai-font-lock-defaults
   `(;; Keywords
+    ("#\\w+" . font-lock-preprocessor-face)
+	
     (,(jai-keywords-rx jai-keywords) 1 font-lock-keyword-face)
 
     ;; Single quote characters
@@ -130,8 +132,6 @@
     ;; Variables
     (,(jai-keywords-rx jai-builtins) 1 font-lock-variable-name-face)
 
-    ;; Hash directives
-    ("#\\w+" . font-lock-preprocessor-face)
 
     ;; At notes
     ("@\\w+" . font-lock-preprocessor-face)
@@ -146,7 +146,6 @@
     ;; Built-in types
     (,(jai-keywords-rx jai-typenames) 1 font-lock-type-face)
 
-
 	("\\b\\([A-Z_][A-Z0-9_]+\\)\\b" 1 'jai-uppercase-face)
 	
 	;; Function declarations
@@ -159,6 +158,7 @@
 
 	(,(regexp-opt '("." "+" "-" "*" "/" "%" ":" "=" "+=" "-=" "*=" "/=" "%="
                     "==" "!=" ">=" "<=" "&&" "||" "!" "&" "|" "^" "~" "<<" ">>" "<" ">") t) . 'jai-operator-face)
+    ;; Hash directives
 
     ;; Other constants
     ("---" . font-lock-constant-face))
@@ -210,13 +210,23 @@
         (run-with-idle-timer 0.1 nil #'jai-refresh-highlighting)))
 
 (defun jai-refresh-highlighting ()
-  "Refresh highlighting efficiently."
+  "Refresh highlighting efficiently, changing face only if it's currently default."
   (dolist (rule jai-highlight-rules)
     (let* ((regex (car rule))
            (face (cdr rule))
            (names (jai-extract-names regex 10000)) ;; Limit scanning range
            (new-regex (jai-generate-regex names)))
-      (jai-update-highlighting rule new-regex face))))
+      (when new-regex
+        (save-excursion
+          (goto-char (point-min))
+          (let ((change-face nil))
+            (while (and (not change-face) (re-search-forward new-regex nil t))
+              (let ((current-face (get-text-property (match-beginning 0) 'face)))
+                (when (or (not current-face) (eq current-face 'default))
+                  (setq change-face t))))
+            (when change-face
+              (jai-update-highlighting rule new-regex face))))))))
+
 
 (defun jai-trigger-refresh (_beg _end _len)
   "Trigger a refresh with debouncing when text is modified."
@@ -249,13 +259,12 @@
   "Regex to match Jai type declarations, excluding cases where '(' appears after '::'.")
 (jai-add-highlight-rule jai-type-declaration-rx 'font-lock-type-face)
 
-(jai-add-highlight-rule "\\(\\w+\\)\\s-*::\\s-*[*A-Z0-9\"[]" 'font-lock-function-name-face)
+(jai-add-highlight-rule "\\(\\w+\\)\\s-*::\\s-*[*A-Z0-9\"[]" 'font-lock-type-face)
 
 
 ;(jai-add-highlight-rule "\\<[a-zA-Z_]+\\>[[:space:]]*:[[:space:]]*\\(?:\\[[^]]+\\][[:space:]]*\\)?\\<\\([a-zA-Z0-9_]+\\)\\>[[:space:]]*;" 'font-lock-type-face)
 (jai-add-highlight-rule "\\<[a-zA-Z_]+\\>[[:space:]]*:[[:space:]]*\\(?:\\[[^]]+\\][[:space:]]*\\)?\\<\\([*]?[a-zA-Z0-9_]+\\)\\>[[:space:]]*[;),]" 'font-lock-type-face)
-
-
+(jai-add-highlight-rule "\\bname\\s-*:\\s-*\\([[:word:]]+\\)\\s-*=" 'font-lock-type-face)
 
 
 ;; add setq-local for older emacs versions
@@ -354,12 +363,6 @@
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.jai\\'" . jai-mode))
-
-(setq compilation-error-regexp-alist-alist "")
-(defconst jai--error-regexp
-  "\\([^ \n:]+.*\.jai\\):\\([0-9]+\\),\\([0-9]+\\):")
-(push `(jai ,jai--error-regexp 1 2 3 2) compilation-error-regexp-alist-alist)
-(push 'jai compilation-error-regexp-alist)
 
 (provide 'jai-mode)
 ;;; jai-mode.el ends here

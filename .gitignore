@@ -1,1 +1,3 @@
 user
+*.elc
+*.reg

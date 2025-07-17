@@ -3,12 +3,16 @@ setlocal enabledelayedexpansion
 
 mkdir user
 
+
 REM Get script folder and convert backslashes to forward slashes
 set "MyPath=%~dp0"
 set "MyPath=%MyPath:\=/%"
 
 REM Remove trailing slash if present
 if "!MyPath:~-1!"=="/" set "MyPath=!MyPath:~0,-1!"
+
+setx EMACS_SERVER_FILE "!MyPath!/user/server/server" /m
+setx ALTERNATE_EDITOR "runemacs.exe" /m
 
 REM Create .emacs file in current directory
 

@@ -5,8 +5,9 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    '(ace-window company consult dash dash-functional drag-stuff dumb-jump
-				gruber-darker-theme ido-completing-read+ load-relative
-				markdown-mode multiple-cursors naysayer-theme smex
+				gruber-darker-theme ido-completing-read+ ivy
+				load-relative markdown-mode multiple-cursors
+				naysayer-theme projectile rg smex swiper topsy
 				undo-fu-session vundo vundu xterm-color))
  '(warning-suppress-log-types '((comp))))
 (custom-set-faces

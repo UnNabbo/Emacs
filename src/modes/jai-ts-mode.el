@@ -106,7 +106,7 @@
      ((node-is "}") parent-bol 0)
      ((parent-is "block") parent-bol jai-ts-mode-indent-offset)
      ((parent-is "struct_literal") parent-bol jai-ts-mode-indent-offset)
-     ((parent-is "if_case_statement") parent-bol 0)  ;; Jai's style is no indent on cases?
+     ((parent-is "if_case_statement") parent-bol jai-ts-mode-indent-offset)
      ((parent-is "if_statement") parent-bol jai-ts-mode-indent-offset)
      ((parent-is "named_parameters") parent-bol jai-ts-mode-indent-offset)
      ((match nil "assignment_parameters" nil 1 1) standalone-parent jai-ts-mode-indent-offset)
@@ -116,6 +116,11 @@
      ((parent-is "struct_declaration") parent-bol jai-ts-mode-indent-offset)
      ((parent-is "enum_declaration") parent-bol jai-ts-mode-indent-offset)
      ((parent-is "const_declaration") parent-bol jai-ts-mode-indent-offset)
+	 
+     ((parent-is "anonymus_struct_type") parent-bol jai-ts-mode-indent-offset)
+     ((parent-is "push_context_statement") parent-bol jai-ts-mode-indent-offset)
+     ((parent-is "switch_case") parent-bol jai-ts-mode-indent-offset)  ;; Jai's style is no indent on cases?
+	 
      (no-node parent-bol 0)))
   "Tree-sitter indent rules for `jai-ts-mode'.")
 
@@ -155,23 +160,14 @@
       (struct_literal type: (identifier) @font-lock-type-face)
       (const_declaration name: (identifier) @font-lock-type-face)
       (enum_declaration name: (identifier) @font-lock-type-face)
-      (member_type (identifier) @font-lock-type-face))
+      (member_type (identifier) @font-lock-type-face)
+	  
+      (parameterized_struct_type (identifier) @font-lock-type-face)
+	  )
 
     :language 'jai
     :feature 'preprocessor
-    '(
-      (load (compiler_directive) @font-lock-preprocessor-face)
-      (import (compiler_directive) @font-lock-preprocessor-face)
-      (run_statement (compiler_directive) @font-lock-preprocessor-face)
-      (struct_or_union_block (compiler_directive) @font-lock-preprocessor-face)
-      (compiler_directive [("#") (identifier)] @font-lock-preprocessor-face)
-      (modify_block (compiler_directive) @font-lock-preprocessor-face)
-      (run_or_insert_expression (compiler_directive) @font-lock-preprocessor-face)
-      (static_if_statement (compiler_directive) @font-lock-preprocessor-face)
-      (asm_statement (compiler_directive) @font-lock-preprocessor-face)
-      (assert_statement (compiler_directive) @font-lock-preprocessor-face)
-      (through_statement (compiler_directive) @font-lock-preprocessor-face)
-      (placeholder_declaration (compiler_directive) @font-lock-preprocessor-face)
+    '(((compiler_directive) @font-lock-preprocessor-face)
       (type_literal ("#type") @font-lock-preprocessor-face))
 
     :language 'jai
@@ -196,7 +192,13 @@
       (else_clause ("else") @font-lock-keyword-face)
       (if_expression ("ifx") @font-lock-keyword-face)
       (if_expression [("then") ("else")] @font-lock-keyword-face)
-      (auto_cast_expression ("xx") @font-lock-keyword-face))
+      (auto_cast_expression ("xx") @font-lock-keyword-face)
+
+	  ;(anonymus_struct_type "struct" @font-lock-keyword-face) ;; TODO: check this later
+      (cast_v2_expression ("cast") @font-lock-keyword-face)
+      (push_context_statement ("push_context") @font-lock-keyword-face)
+      (push_context_statement modifier: (identifier) @font-lock-keyword-face)
+	  )
 
     :language 'jai
     :feature 'function
@@ -243,7 +245,7 @@
 
     :language 'jai
     :feature 'constant
-    '(([(boolean) (null)] @font-lock-constant-face))))
+    '(([(boolean) (null)] @font-lock-keyword-face))))
 
 (defconst jai-ts-mode--defun-function-type-list
   '("procedure_declaration"
@@ -297,7 +299,7 @@ Return nil if there is no name or if NODE is not a defun node."
                   ("enum" "\\`enum_declaration\\'" nil jai-ts-mode--defun-name)))
 
     ;; Indent.
-    (setq-local indent-tabs-mode nil
+    (setq-local indent-tabs-mode t
                 treesit-simple-indent-rules jai-ts-mode--indent-rules
                 which-func-functions nil)
 
@@ -405,5 +407,13 @@ ARG will be passed through (for going forwards)."
 (add-to-list 'auto-mode-alist '("\\.jai\\'" . jai-ts-mode))
 
 (provide 'jai-ts-mode)
+
+
+(defface jai-uppercase-face '((t (:foreground "#96a6c8")))
+  "Face for uppercase words in C/C++.")
+
+(font-lock-add-keywords 'jai-ts-mode
+  '(("\\b\\([A-Z_]+\\)\\b" . 'jai-ts-all-caps-face)))
+
 
 ;;; jai-ts-mode.el ends here
