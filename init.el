@@ -18,7 +18,7 @@
 (global-set-key (kbd "C-x p d") 'rc/insert-timestamp)
 
 (load-relative "src/misc.el")
-(global-set-key (kbd "<tab>") 'indent-or-dabbrev-expand)
+;(global-set-key (kbd "<tab>") 'indent-or-dabbrev-expand)
 (global-set-key (kbd "C-ò") 'jump-to-next-char)
 
 (load-relative "src/ui.el")
@@ -35,6 +35,8 @@
 (load-relative "src/modules/jump.el")
 
 (load-relative "src/modules/drag.el")
+(define-key drag-stuff-mode-map (drag-stuff--kbd 'up) 'drag-stuff-up)
+(define-key drag-stuff-mode-map (drag-stuff--kbd 'down) 'drag-stuff-down)
 
 (load-relative "src/modules/ido_smex.el")
 (global-set-key (kbd "M-x") 'smex)
@@ -50,16 +52,17 @@
 
 ;; (load-relative "src/modules/topsy.el")
 ;; (rc/require 'rg)
-;; (rc/require 'ivy)
 ;; (rc/require 'swiper)
 ;; (keymap-global-set "C-s" #'swiper-isearch)
 
-;; (rc/require 'projectile)
-;; (projectile-mode +1)
-;; (setq projectile-completion-system 'ivy)
-;; (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+(require 'which-key)
+(setq which-key-sort-order 'which-key-prefix-then-key-order)
+(which-key-mode)
 
-(load-relative "src/modules/consult.el")
+(load-relative "src/modules/projectile_ext.el")
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+
+(load-relative "src/modules/autocomplete.el")
 
 (rc/require 'multiple-cursors)
 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
@@ -87,6 +90,8 @@
 (define-key jai-ts-mode-map (kbd "C-M-l")   'align-regexp)
 (define-key jai-ts-mode-map (kbd "M-i")   'jai/if0)
 
+(rc/require 'glsl-mode)
+
 (load-relative "src/c-extension.el")
 (with-eval-after-load 'cc-mode
   (dolist (map (list c-mode-map c++-mode-map))
@@ -112,7 +117,5 @@
 (font-lock-add-keywords 'python-ts-mode
 						`((,(regexp-opt jai-operators) 0 'font-lock-operator-face )))
 
-
-(require 'server)
-(unless (server-running-p)
-  (server-start)) 
+(setq exec-path (add-to-list 'exec-path "C:/Program Files/Gow/bin"))
+(setenv "PATH" (concat "C:\\Program Files\\Gow\\bin;" (getenv "PATH"))) 

@@ -1,13 +1,5 @@
 ;; Define custom keywords
 
-(defun indent-or-dabbrev-expand ()
-  (interactive)
-  (let ((indent-pos (save-excursion (back-to-indentation) (point))))
-    (if (<= (point) indent-pos)
-        (indent-for-tab-command)
-      (dabbrev-expand nil))))
-
-(define-key global-map  (kbd "TAB") 'indent-or-dabbrev-expand)
 
 
 (setq fixme-modes '(c++-mode c-mode emacs-lisp-mode))

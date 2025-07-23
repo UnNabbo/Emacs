@@ -4,11 +4,13 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(ace-window company consult dash dash-functional drag-stuff dumb-jump
+   '(ace-window ag cape company company-mode consult corfu dash
+				dash-functional drag-stuff dumb-jump glsl-mode
 				gruber-darker-theme ido-completing-read+ ivy
 				load-relative markdown-mode multiple-cursors
-				naysayer-theme projectile rg smex swiper topsy
-				undo-fu-session vundo vundu xterm-color))
+				naysayer-theme nil orderless popup projectile rg
+				ripgrep rp s smex swiper topsy undo-fu-session vundo
+				vundu xterm-color))
  '(warning-suppress-log-types '((comp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

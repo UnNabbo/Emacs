@@ -167,3 +167,9 @@ This command does the inverse of `fill-paragraph'."
 (setq x-alt-keysym 'meta)
 
 (setq confirm-kill-emacs 'y-or-n-p)
+
+(rc/require 'load-relative)
+
+(require 'server)
+(unless (server-running-p)
+  (server-start)) 

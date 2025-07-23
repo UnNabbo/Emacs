@@ -63,10 +63,6 @@
   (advice-add #'register-preview :override #'consult-register-window)
   (setq register-preview-delay 0.5)
 
-  ;; Use Consult to select xref locations with preview
-  (setq xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
-
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
   :config
@@ -95,3 +91,29 @@
   ;; You may want to use `embark-prefix-help-command' or which-key instead.
   ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
 )
+
+
+(defvar my/ignore-modules t
+  "If non-nil, 'modules/' is excluded in consult-ripgrep searches.")
+
+(defun toggle-modules-search ()
+  "Toggle whether 'modules/' is included in consult-ripgrep."
+  (interactive)
+  (setq my/ignore-modules (not my/ignore-modules))
+  (setq consult-ripgrep-args
+        (concat "rg "
+                "--null "
+                "--line-buffered "
+                "--color=never "
+                "--max-columns=1000 "
+                "--path-separator / "
+                "--smart-case "
+                "--no-heading "
+                "--with-filename "
+                "--line-number "
+                "--search-zip "
+                (when my/ignore-modules "--glob \"!modules/*\" ")))
+  (message "Modules directory is now %s in search."
+           (if my/ignore-modules "IGNORED" "INCLUDED")))
+
+(global-set-key (kbd "<f8>") 'toggle-modules-search)
