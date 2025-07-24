@@ -5,8 +5,8 @@
 
 ;;; REMOVE TO DEBUG INIT FILE
 (setq-default message-log-max nil)
-
-;(kill-buffer "*Messages*")
+(when (get-buffer "*Messages*")
+  (kill-buffer "*Messages*"))
 (setq make-backup-files nil)
 
 
@@ -116,6 +116,3 @@
 
 (font-lock-add-keywords 'python-ts-mode
 						`((,(regexp-opt jai-operators) 0 'font-lock-operator-face )))
-
-(setq exec-path (add-to-list 'exec-path "C:/Program Files/Gow/bin"))
-(setenv "PATH" (concat "C:\\Program Files\\Gow\\bin;" (getenv "PATH"))) 
