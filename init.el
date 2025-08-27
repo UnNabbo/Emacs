@@ -9,6 +9,7 @@
   (kill-buffer "*Messages*"))
 (setq make-backup-files nil)
 
+(setq-default indent-tabs-mode t tab-width 4)
 
 (load-file  (expand-file-name "../src/basic.el" user-emacs-directory))
 (global-set-key (kbd "C-c p") 'find-file-at-point)
@@ -81,7 +82,8 @@
 
 (rc/require 'vundo)
 
-(load-relative "src/modes/jai-mode.el")
+
+;;(load-relative "src/modes/jai-mode.el")
 (load-relative "src/modes/jai-ts-mode.el")
 (load-relative "src/jai_tweaks.el")
 (define-key jai-ts-mode-map (kbd "C-M-a")   'jai-ts-mode--prev-defun)
@@ -106,13 +108,4 @@
 (global-set-key (kbd "M-RET") (lambda () (interactive) (push-mark) (ffap)))
 
 
-(load-relative "src/emacs_bug.el")
-
-;TODO make this stick to every ts-mode
-(defconst jai-operators
-  '("." ":" "+" "-" "*" "/" 
-    "%" "=" "+=" "-=" "*=" "/=" "%="
-    "==" "!=" ">=" "<=" "&&" "||" "!" "&" "|" "^" "~" "<<" ">>" "<" ">"))
-
-(font-lock-add-keywords 'python-ts-mode
-						`((,(regexp-opt jai-operators) 0 'font-lock-operator-face )))
+;(load-relative "src/emacs_bug.el")

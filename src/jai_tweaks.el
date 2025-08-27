@@ -1,3 +1,20 @@
+
+(use-package eglot
+  :defer t
+  :custom
+  (eglot-ignored-server-capabilities '(:documentHighlightProvider))
+  (eglot-events-buffer-size 0)
+  :config
+  (add-to-list
+   'eglot-server-programs
+   ;; or jai-ts-mode, depending on what you're using
+   '(jai-ts-mode . ("D:/dev/Jails/bin/jails"))))
+
+(add-hook 'jai-ts-mode-hook
+          (lambda ()
+            (when (fboundp 'eglot-ensure)
+              (eglot-ensure))))
+
 (custom-set-faces '(font-lock-number-face ((t (:foreground "Yellow")))))
 (custom-set-faces '(font-lock-operator-face ((t (:foreground "#bd2c2d")))))
 

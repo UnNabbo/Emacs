@@ -1,6 +1,5 @@
 (load-relative "corfu.el")
 (load-relative "corfu-history.el")
-(rc/require 'cape)
 
 (use-package corfu
   ;; TAB-and-Go customizations
@@ -9,11 +8,10 @@
   ;(corfu-preselect 'directory) ;; Always preselect the prompt
   (tab-always-indent 'complete)
   (corfu-auto t)
-  (corfu-auto-prefix 0)         ; Start completing immediately
-  (corfu-auto-delay 0.0)        ; No delay before showing completions
+  (corfu-auto-prefix 1)         ; Start completing immediately
+  (corfu-auto-delay 0)        ; No delay before showing completions
   (corfu-count 0)
   (corfu-preselect 'prompt)    ; Always preselect first candidate
-  
   :config
   (advice-add #'corfu--message :override #'ignore)
   ;; Override the popup display function to do nothing
@@ -31,30 +29,47 @@
   :init
   (global-corfu-mode))
 
-
-
-(use-package cape
-  ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
-  ;; Press C-c p ? to for help.
-  :bind ("C-c p" . cape-prefix-map) ;; Alternative key: M-<tab>, M-p, M-+
-  ;; Alternatively bind Cape commands individually.
-  ;; :bind (("C-c p d" . cape-dabbrev)
-  ;;        ("C-c p h" . cape-history)
-  ;;        ("C-c p f" . cape-file)
-  ;;        ...)
-  :init
-  ;; Add to the global default value of `completion-at-point-functions' which is
-  ;; used by `completion-at-point'.  The order of the functions matters, the
-  ;; first function returning a result wins.  Note that the list of buffer-local
-  ;; completion functions takes precedence over the global list.
-  (add-hook 'completion-at-point-functions #'cape-dabbrev)
-  ;; ...
-
-)
-
 (keymap-unset corfu-map "<up>")
 (keymap-unset corfu-map "<down>")
 
 
-(setq-default indent-tabs-mode t
-              tab-width 4)
+
+(use-package orderless
+  :ensure t
+  :custom
+  (orderless-matching-styles '(orderless-prefix)) ; Only prefix matching
+  (orderless-style-dispatchers nil) ; Disable special pattern dispatchers
+  :config
+  ;; Set Orderless as the only completion style
+  (setq completion-styles '(orderless)
+        completion-category-defaults nil
+        completion-category-overrides nil))
+
+(defun orderless-fast-dispatch (word index total)
+  (and (= index 0) (= total 1) (length< word 99)
+       (cons 'orderless-literal-prefix word)))
+
+(orderless-define-completion-style orderless-fast
+  (orderless-style-dispatchers '(orderless-fast-dispatch))
+  (orderless-matching-styles '(orderless-literal orderless-regexp)))
+
+(add-hook 'corfu-mode-hook
+          (lambda ()
+            (setq-local completion-styles '(orderless-fast basic)
+                        completion-category-overrides nil
+                        completion-category-defaults nil)))
+
+(add-hook 'corfu-mode-hook
+          (lambda ()
+            (setq-local completion-styles '(orderless-prefix)
+                        completion-category-overrides nil
+                        completion-category-defaults nil)))
+
+(rc/require 'cape)
+(use-package cape
+  :bind ("C-c p" . cape-prefix-map) ;; Alternative key: M-<tab>, M-p, M-+
+  :config
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-keyword))
+

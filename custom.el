@@ -4,10 +4,10 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(ace-window ag cape company company-mode consult corfu dash
+   '(ace-window ag cape company company-mode consult corfu corfu.el dash
 				dash-functional drag-stuff dumb-jump glsl-mode
 				gruber-darker-theme ido-completing-read+ ivy
-				load-relative markdown-mode multiple-cursors
+				load-relative lsp-mode markdown-mode multiple-cursors
 				naysayer-theme nil orderless popup projectile rg
 				ripgrep rp s smex swiper topsy undo-fu-session vundo
 				vundu xterm-color))

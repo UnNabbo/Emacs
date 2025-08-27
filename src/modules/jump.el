@@ -1,6 +1,4 @@
-(rc/require 's)
-(rc/require 'popup)
-(load-relative "dumb-jump.el")
+(rc/require 'dumb-jump)
 
 
 (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
