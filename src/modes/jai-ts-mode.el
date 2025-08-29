@@ -117,7 +117,7 @@
      ((parent-is "enum_declaration") parent-bol jai-ts-mode-indent-offset)
      ((parent-is "const_declaration") parent-bol jai-ts-mode-indent-offset)
 	 
-     ((parent-is "anonymus_struct_type") parent-bol jai-ts-mode-indent-offset)
+     ((parent-is "anonymous_struct_type") parent-bol jai-ts-mode-indent-offset)
      ((parent-is "push_context_statement") parent-bol jai-ts-mode-indent-offset)
      ((parent-is "switch_case") parent-bol jai-ts-mode-indent-offset)  ;; Jai's style is no indent on cases?
 	 
@@ -194,9 +194,20 @@
       (if_expression [("then") ("else")] @font-lock-keyword-face)
       (auto_cast_expression ("xx") @font-lock-keyword-face)
 
-	  ;(anonymus_struct_type "struct" @font-lock-keyword-face) ;; TODO: check this later
+	  (anonymous_struct_type ("struct") @font-lock-keyword-face) ;; TODO: check this later
+      (parameter keyword: ("using") @font-lock-keyword-face)
+	  
+      (using_statement modifier: ("except") @font-lock-keyword-face)
+      (using_statement modifier: (identifier) @font-lock-keyword-face)
+      (using_statement modifier: (",") @font-lock-operator-face)
+	  
       (cast_v2_expression ("cast") @font-lock-keyword-face)
+      (cast_v2_expression modifier: (identifier) @font-lock-keyword-face)
+      (cast_v2_expression modifier: (",") @font-lock-operator-face)
+	  
       (push_context_statement ("push_context") @font-lock-keyword-face)
+	  
+      (push_context_statement modifier: (",") @font-lock-operator-face)
       (push_context_statement modifier: (identifier) @font-lock-keyword-face)
 	  )
 

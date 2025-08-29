@@ -1,6 +1,27 @@
 (load-relative "corfu.el")
 (load-relative "corfu-history.el")
+(defun my-project-buffers ()
+  "Return a list of buffers belonging to the current project, with filtering."
+  (when-let ((project (project-current)))
+    (cl-remove-if-not
+     (lambda (buffer)
+       (when-let ((file (buffer-file-name buffer)))
+         (and (project-file-p project file)
+              (my-allowed-file-p file)     ; Add your custom filtering
+              (not (my-excluded-file-p file)))))
+     (buffer-list))))
 
+(defun my-allowed-file-p (file)
+  "Check if FILE should be included based on extension."
+  (let ((ext (file-name-extension file)))
+    (member ext '("jai"))))
+
+(defun my-excluded-file-p (file)
+  "Check if FILE should be excluded based on path."
+  (string-match-p "/\\(out\\|dist\\|build\\)/" file))
+
+;; Configure cape to only search in project buffers
+(setq cape-dabbrev-check-other-buffers 'my-project-buffers)
 (use-package corfu
   ;; TAB-and-Go customizations
   :custom
@@ -18,7 +39,12 @@
   (advice-add #'corfu--show :override #'ignore)
   ;; Ensure candidates are still processed (silent backend)
   (setq corfu--candidates nil)  ; Prevent visual clutter
-  
+  (setq completion-at-point-functions
+        (list
+		 ;#'cape-dabbrev
+		 #'my-cape-dabbrev-from-project-files
+		 #'cape-file
+		 #'cape-keyword))
   :bind  ; Use TAB for cycling, default is `corfu-complete'.
   (:map corfu-map
         ("TAB" . corfu-next)
@@ -31,39 +57,6 @@
 
 (keymap-unset corfu-map "<up>")
 (keymap-unset corfu-map "<down>")
-
-
-
-(use-package orderless
-  :ensure t
-  :custom
-  (orderless-matching-styles '(orderless-prefix)) ; Only prefix matching
-  (orderless-style-dispatchers nil) ; Disable special pattern dispatchers
-  :config
-  ;; Set Orderless as the only completion style
-  (setq completion-styles '(orderless)
-        completion-category-defaults nil
-        completion-category-overrides nil))
-
-(defun orderless-fast-dispatch (word index total)
-  (and (= index 0) (= total 1) (length< word 99)
-       (cons 'orderless-literal-prefix word)))
-
-(orderless-define-completion-style orderless-fast
-  (orderless-style-dispatchers '(orderless-fast-dispatch))
-  (orderless-matching-styles '(orderless-literal orderless-regexp)))
-
-(add-hook 'corfu-mode-hook
-          (lambda ()
-            (setq-local completion-styles '(orderless-fast basic)
-                        completion-category-overrides nil
-                        completion-category-defaults nil)))
-
-(add-hook 'corfu-mode-hook
-          (lambda ()
-            (setq-local completion-styles '(orderless-prefix)
-                        completion-category-overrides nil
-                        completion-category-defaults nil)))
 
 (rc/require 'cape)
 (use-package cape

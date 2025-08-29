@@ -1,13 +1,9 @@
-(defun indent-or-dabbrev-expand ()
-  (interactive)
-  (let ((indent-pos (save-excursion (back-to-indentation) (point))))
-    (if (<= (point) indent-pos)
-        (indent-for-tab-command)
-      (dabbrev-expand nil))))
 
 (setq-default indent-tabs-mode t
               tab-width 4)
 
+
+(setq-default indent-tabs-mode t tab-width 4)
 (setq fixme-modes '(c++-ts-mode jai-ts-mode c-ts-mode emacs-lisp-mode))
 (make-face 'font-lock-fixme-face)
 (make-face 'font-lock-note-face)
@@ -36,6 +32,13 @@ With optional COUNT, skip COUNT matches of C."
       (activate-mark))))
 
 
+
+(defun indent-or-dabbrev-expand ()
+  (interactive)
+  (let ((indent-pos (save-excursion (back-to-indentation) (point))))
+    (if (<= (point) indent-pos)
+        (indent-for-tab-command)
+      (dabbrev-expand nil))))
 (setq-default indent-tabs-mode 'only)
 (advice-add 'indent-to :around
   (lambda (orig-fun column &rest args)

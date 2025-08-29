@@ -1,4 +1,4 @@
-;;; Initialization
+;; Initialization
 (package-initialize)
 (setq custom-file (expand-file-name "../custom.el" user-emacs-directory))
 (load-file custom-file)
@@ -9,7 +9,7 @@
   (kill-buffer "*Messages*"))
 (setq make-backup-files nil)
 
-(setq-default indent-tabs-mode t tab-width 4)
+(setq eglot-report-progress nil)
 
 (load-file  (expand-file-name "../src/basic.el" user-emacs-directory))
 (global-set-key (kbd "C-c p") 'find-file-at-point)
@@ -25,6 +25,10 @@
 (load-relative "src/ui.el")
 (global-set-key (kbd "C-c t") 'switch-theme)
 
+(rc/require 'diminish)
+(diminish 'eldoc-mode)
+(diminish 'flymake-mode "p")
+
 (setq compile-command "jai first.jai -")
 (load-relative "src/compile.el")
 (global-set-key (kbd "M-m") 'compile-in-root-without-asking)
@@ -38,6 +42,7 @@
 (load-relative "src/modules/drag.el")
 (define-key drag-stuff-mode-map (drag-stuff--kbd 'up) 'drag-stuff-up)
 (define-key drag-stuff-mode-map (drag-stuff--kbd 'down) 'drag-stuff-down)
+(diminish 'drag-stuff-mode)
 
 (load-relative "src/modules/ido_smex.el")
 (global-set-key (kbd "M-x") 'smex)
@@ -59,11 +64,14 @@
 (require 'which-key)
 (setq which-key-sort-order 'which-key-prefix-then-key-order)
 (which-key-mode)
+(diminish 'which-key-mode)
 
 (load-relative "src/modules/projectile_ext.el")
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-
+(diminish 'projectile-mode)
+			
 (load-relative "src/modules/autocomplete.el")
+
 
 (rc/require 'multiple-cursors)
 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
@@ -82,8 +90,33 @@
 
 (rc/require 'vundo)
 
+(setq eglot-booster-io-only t)
+(use-package eglot-booster											 
+	:after eglot													 
+	:config	(eglot-booster-mode))									 
+																	 
+(use-package eglot													 
+  :defer t															 
+  :custom															 
+  (eglot-ignored-server-capabilities '(:documentHighlightProvider))	 
+  (setf (plist-get eglot-events-buffer-config :size) 0)				 
+  (setq eglot-events-buffer-size 0)									 
+  :config															 
+  (add-to-list														 
+   'eglot-server-programs											 
+   '(jai-ts-mode . ("jails"))))
 
+(setq eglot-ignored-server-capabilities '(:completionProvider))
+(defun remove-eglot-completion ()
+  (remove-hook 'completion-at-point-functions #'eglot-completion-at-point t))
+
+(add-hook 'eglot-managed-mode-hook #'remove-eglot-completion)
 ;;(load-relative "src/modes/jai-mode.el")
+
+
+(custom-set-faces '(font-lock-number-face ((t (:foreground "Yellow")))))
+(custom-set-faces '(font-lock-operator-face ((t (:foreground "#bd2c2d")))))
+
 (load-relative "src/modes/jai-ts-mode.el")
 (load-relative "src/jai_tweaks.el")
 (define-key jai-ts-mode-map (kbd "C-M-a")   'jai-ts-mode--prev-defun)
